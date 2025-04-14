@@ -42,12 +42,9 @@ class Conv(nn.Module):
         conv (nn.Conv2d): Convolutional layer.
         bn (nn.BatchNorm2d): Batch normalization layer.
         act (nn.Module): Activation function layer.
-        default_act (nn.Module): Default activation function (SiLU).
+        default_act (nn.Module): Default activation function (ELU).
     """
-
-    self.act = nn.ELU() if act else nn.Identity()
-
-
+    
     def __init__(self, c1, c2, k=1, s=1, p=None, g=1, d=1, act=True):
         """
         Initialize Conv layer with given parameters.
@@ -65,6 +62,7 @@ class Conv(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p, d), groups=g, dilation=d, bias=False)
         self.bn = nn.BatchNorm2d(c2)
+        self.default_act = nn.ELU()  # 🔄 Changed from nn.SiLU() to nn.ELU()
         self.act = self.default_act if act is True else act if isinstance(act, nn.Module) else nn.Identity()
 
     def forward(self, x):
