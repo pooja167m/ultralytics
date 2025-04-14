@@ -36,21 +36,18 @@ def autopad(k, p=None, d=1):  # kernel, padding, dilation
     return p
 
 
-class Mish(nn.Module):
-    def forward(self, x):
-        return x * torch.tanh(F.softplus(x))
-
 class Conv(nn.Module):
     """
-    Standard convolution module with batch normalization and activation.
+    Standard convolution module with batch normalization and GELU activation.
     """
     
     def __init__(self, c1, c2, k=1, s=1, p=None, g=1, d=1, act=True):
         super().__init__()
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p, d), groups=g, dilation=d, bias=False)
         self.bn = nn.BatchNorm2d(c2)
-        self.default_act = Mish()  # 🔄 Changed to Mish activation
+        self.default_act = nn.GELU()  # ✅ Changed to GELU
         self.act = self.default_act if act is True else act if isinstance(act, nn.Module) else nn.Identity()
+
 
     def forward(self, x):
         return self.act(self.bn(self.conv(x)))
